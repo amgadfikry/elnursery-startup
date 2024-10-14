@@ -64,7 +64,7 @@
 4. **Add the following environment variables to the `.env` file**
 
    ```bash
-      DATABASE_HOST=mongodb:27017
+      DATABASE_HOST=mongodb-primary:27017,mongodb-secondary1:27017,mongodb-secondary2:27017
       ADMIN_NAME=[your name]
       ADMIN_EMAIL=[your email]
       JWT_SECRET=66fafa7278f00e4bd784d57e
