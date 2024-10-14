@@ -1,0 +1,38 @@
+# Basic configuration for docker-compose.yml file
+services:
+  # Server service container configuration
+  server:
+    container_name: server
+    build: ./
+    restart: always
+    networks:
+      - server-mongo
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/app
+    env_file:
+      - ./.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # create mongo db service with name of mongodb
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4.28
+    restart: always
+    networks:
+      - server-mongo
+    expose:
+      - 27017
+    healthcheck:
+      test: echo 'db.runCommand("ping")' | mongo localhost:27017/elnursery --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 6
+
+# create network with name of server-mongo
+networks:
+  server-mongo:
+    name: server-mongo

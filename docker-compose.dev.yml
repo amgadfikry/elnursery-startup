@@ -1,0 +1,17 @@
+# Development configuration
+services:
+  # server service container configuration
+  server:
+    environment:
+      - NODE_ENV=dev
+    command: "npm run start:dev"
+
+  # mongodb service container configuration
+  mongodb:
+    volumes:
+      - mongo-vm-dev:/data/db
+
+# volumes configuration
+volumes:
+  mongo-vm-dev:
+    name: mongo-vm-dev

@@ -1,0 +1,17 @@
+# test configuration
+services:
+  # server service container configuration
+  server:
+    environment:
+      - NODE_ENV=test
+    command: "npm run test:watch"
+
+  # mongodb service container configuration
+  mongodb:
+    volumes:
+      - mongo-vm-test:/data/db
+
+# volumes configuration
+volumes:
+  mongo-vm-dev:
+    name: mongo-vm-test
