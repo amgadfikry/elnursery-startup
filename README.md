@@ -48,14 +48,20 @@
    git clone https://github.com/amgadfikry/elnursery.git
    cd eNursery
    ```
+   
+2. **Install node dependencies**
 
-2. **Create a `.env` file in the root directory**
+   ```bash
+   npm i
+   ```
+
+3. **Create a `.env` file in the root directory**
 
    ```bash
     touch .env
     ```
 
-3. **Add the following environment variables to the `.env` file**
+4. **Add the following environment variables to the `.env` file**
 
    ```bash
       DATABASE_HOST=mongodb:27017
@@ -67,13 +73,13 @@
       MAILGUN_DOMAIN=[your domain]
     ```
 
-4. **Run the following command to start the development environment**
+5. **Run the following command to start the development environment**
 
    ```bash
    docker compose -f docker-compose.yml -f docker-compose.dev.yml up server
    ```
 
-5. **Access the API Documentation**
+6. **Access the API Documentation**
 
    - Open your browser and navigate to `http://localhost:3000/api`
 
