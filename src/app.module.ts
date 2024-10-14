@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, NotFoundException } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { databaseConfig } from './config/database.config';
 import { AdminModule } from './admin/admin.module';
@@ -44,13 +44,14 @@ export class AppModule implements OnModuleInit {
     try {
       // find if admin account already exists
       const admin = await this.adminService.findOneByEmail(this.email);
-      if (!admin) {
+    } catch (error) {
+      if (error instanceof NotFoundException) {
         // create a new admin account
         await this.adminService.create({ email: this.email, name: this.name, roles: ["owner"], });
         console.log('Admin account created successfully');
+      } else {
+        console.error('Error while creating admin account', error);
       }
-    } catch (error) {
-      console.error('Error while creating admin account', error);
     }
   }
 }
