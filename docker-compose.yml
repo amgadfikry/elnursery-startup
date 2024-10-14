@@ -14,12 +14,11 @@ services:
     env_file:
       - ./.env
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - initReplica
 
-  # create mongo db service with name of mongodb
-  mongodb:
-    container_name: mongodb
+  # create mongodb pimary node service container configuration
+  mongodb-primary:
+    container_name: mongodb-primary
     image: mongo:4.4.28
     restart: always
     networks:
@@ -31,6 +30,56 @@ services:
       interval: 10s
       timeout: 10s
       retries: 6
+    command: mongod --replSet demo --bind_ip_all --port 27017
+
+  # create first mongodb secondary node service container configuration
+  mongodb-secondary1:
+    container_name: mongodb-secondary1
+    image: mongo:4.4.28
+    restart: always
+    networks:
+      - server-mongo
+    expose:
+      - 27017
+    healthcheck:
+      test: echo 'db.runCommand("ping")' | mongo localhost:27017/elnursery --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 6
+    command: mongod --replSet demo --bind_ip_all --port 27017
+
+  # create second mongodb secondary node service container configuration
+  mongodb-secondary2:
+    container_name: mongodb-secondary2
+    image: mongo:4.4.28
+    restart: always
+    networks:
+      - server-mongo
+    expose:
+      - 27017
+    healthcheck:
+      test: echo 'db.runCommand("ping")' | mongo localhost:27017/elnursery --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 6
+    command: mongod --replSet demo --bind_ip_all --port 27017
+
+  # Create initReplica service container for replica set configuration and initialization then exit
+  initReplica:
+    image: mongo:4.4.28
+    container_name: initReplica
+    depends_on:
+      mongodb-primary:
+        condition: service_healthy
+      mongodb-secondary1:
+        condition: service_healthy
+      mongodb-secondary2:
+        condition: service_healthy
+    networks:
+      - server-mongo
+    volumes:
+      - ./init-replica.sh:/init-replica.sh
+    entrypoint: ["/bin/bash", "/init-replica.sh"]
 
 # create network with name of server-mongo
 networks:

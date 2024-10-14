@@ -6,12 +6,26 @@ services:
       - NODE_ENV=dev
     command: "npm run start:dev"
 
-  # mongodb service container configuration
-  mongodb:
+  # mongodb primary node service container configuration
+  mongodb-primary:
     volumes:
-      - mongo-vm-dev:/data/db
+      - mongo-dev-prime:/data/db
+
+  # mongodb secondary1 node service container configuration
+  mongodb-secondary1:
+    volumes:
+      - mongo-dev-sec1:/data/db
+
+  # mongodb secondary2 node service container configuration
+  mongodb-secondary2:
+    volumes:
+      - mongo-dev-sec2:/data/db
 
 # volumes configuration
 volumes:
-  mongo-vm-dev:
-    name: mongo-vm-dev
+  mongo-dev-prime:
+    name: mongo-dev-prime
+  mongo-dev-sec1:
+    name: mongo-dev-sec1
+  mongo-dev-sec2:
+    name: mongo-dev-sec2

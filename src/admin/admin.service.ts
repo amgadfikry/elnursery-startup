@@ -13,6 +13,8 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PasswordService } from 'src/password/password.service';
 import { EmailService } from 'src/common/email.service';
+import { TransactionService } from 'src/transaction/transaction.service';
+import { ClientSession } from 'mongoose';
 
 /* Admin Service with methods for CRUD operations
     Attributes:
@@ -25,10 +27,12 @@ import { EmailService } from 'src/common/email.service';
 */
 @Injectable()
 export class AdminService {
+  // Inject the Admin model, PasswordService, EmailService and TransactionService
   constructor(
     @InjectModel(Admin.name) private adminModel: Model<AdminDocument>,
     @Inject(forwardRef(() => PasswordService)) private readonly passwordService: PasswordService,
     private readonly emailService: EmailService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   /* Create a new admin account and return the created admin
@@ -41,23 +45,25 @@ export class AdminService {
         - InternalServerErrorException: An error occurred while creating the admin
   */
   async create(createAdminDto: CreateAdminDto): Promise<Admin> {
-    try {
-      // generate a random password for the admin account
-      const password = this.passwordService.generateRandomPassword();
-      const hashPassword = await this.passwordService.hashPassword(password);
-      // create a new admin object and save it
-      const adminData = { ...createAdminDto, password: hashPassword };
-      const newAdmin = new this.adminModel(adminData);
-      const createdAdmin = await newAdmin.save();
-      // send account credentials email to the admin
-      await this.emailService.sendAccountCredentials(createAdminDto.name, createAdminDto.email, password);
-      return createdAdmin;
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new ConflictException("Admin with this email already exist");
+    return this.transactionService.withTransaction(async (session) => {
+      try {
+        // generate a random password for the admin account
+        const password = this.passwordService.generateRandomPassword();
+        const hashPassword = await this.passwordService.hashPassword(password);
+        // create a new admin object and save it
+        const adminData = { ...createAdminDto, password: hashPassword };
+        const newAdmin = new this.adminModel(adminData);
+        const createdAdmin = await newAdmin.save({ session });
+        // send account credentials email to the admin
+        await this.emailService.sendAccountCredentials(createAdminDto.name, createAdminDto.email, password);
+        return createdAdmin;
+      } catch (error) {
+        if (error.code === 11000) {
+          throw new ConflictException("Admin with this email already exist");
+        }
+        throw new InternalServerErrorException('An Error occurred while creating the admin');
       }
-      throw new InternalServerErrorException('An Error occurred while creating the admin');
-    }
+    });
   }
 
   /* Get all admins records and return the list of admins
@@ -102,6 +108,7 @@ export class AdminService {
   /* Delete admin by id
       Parameters:
         - id: admin id to delete
+        - session: ClientSession (optional)
       Returns:
         - message: success message after deleting the admin
       Errors:
@@ -109,7 +116,7 @@ export class AdminService {
         - InternalServerErrorException: An error occurred while delete admin record
         - BadRequestException: You cannot delete the owner account
   */
-  async remove(id: string): Promise<{ message: string }> {
+  async remove(id: string, session: ClientSession = null): Promise<{ message: string }> {
     try {
       // get the admin details by id to check if the admin exist
       const user = await this.adminModel.findById(id).exec();
@@ -121,7 +128,7 @@ export class AdminService {
         throw new BadRequestException('You cannot delete the owner account');
       }
       // delete the admin record
-      const result = await this.adminModel.deleteOne({ _id: id }).exec();
+      const result = await this.adminModel.deleteOne({ _id: id }, { session }).exec();
       if (result.deletedCount === 0) {
         throw new NotFoundException(`Admin not found`);
       }
@@ -163,15 +170,16 @@ export class AdminService {
       Parameters:
         - id: string
         - update: object
+        - session: ClientSession (optional)
       Returns:
         - updatedAdmin: Admin document
       Errors:
         - NotFoundException: 'Admin not found'
         - InternalServerErrorException: 'An error occurred while updating admin'
   */
-  async updateWithoutDtoById(id: string, update: Object): Promise<AdminDocument> {
+  async updateWithoutDtoById(id: string, update: Object, session: ClientSession = null): Promise<AdminDocument> {
     try {
-      const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, update, { new: true }).exec();
+      const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, update, { new: true, session }).exec();
       if (!updatedAdmin) {
         throw new NotFoundException('Admin not found');
       }
@@ -188,15 +196,16 @@ export class AdminService {
       Parameters:
         - field: object
         - update: object
+        - session: ClientSession (optional)
       Returns:
         - updatedAdmin: Admin document
       Errors:
         - NotFoundException: 'Admin not found'
         - InternalServerErrorException: 'An error occurred while updating admin'
   */
-  async updateWithoutDtoByFields(field: Object, update: Object): Promise<AdminDocument> {
+  async updateWithoutDtoByFields(field: Object, update: Object, session: ClientSession = null): Promise<AdminDocument> {
     try {
-      const updatedAdmin = await this.adminModel.findOneAndUpdate(field, update, { new: true }).exec();
+      const updatedAdmin = await this.adminModel.findOneAndUpdate(field, update, { new: true, session }).exec();
       if (!updatedAdmin) {
         throw new NotFoundException('Admin not found');
       }
