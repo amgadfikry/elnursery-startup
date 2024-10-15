@@ -10,17 +10,20 @@ import { UserModule } from './user/user.module';
 import { AdminService } from './admin/admin.service';
 import { CommonModule } from './common/common.module';
 import { CronJobsModule } from './cron-jobs/cron-jobs.module';
-
+import { TransactionModule } from './transaction/transaction.module';
+import { TaskModule } from './task/task.module';
 @Module({ 
   // Import the MongooseModule and AdminModule into the AppModule
   imports: [
     MongooseModule.forRoot(databaseConfig.uri),
     CommonModule,
+    TransactionModule,
     CronJobsModule,
     PasswordModule,
     AuthModule,
     AdminModule,
     UserModule,
+    TaskModule
   ],
   controllers: [],
   providers: [
