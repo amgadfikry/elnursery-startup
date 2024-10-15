@@ -13,15 +13,17 @@ import { EmailService } from '../common/email.service';
 import { ChangePasswordTokenDto } from './dto/change-password-token.dto';
 import { AdminService } from 'src/admin/admin.service';
 import { UserService } from 'src/user/user.service';
+import { TransactionService } from 'src/transaction/transaction.service';
 
 // This service is responsible for hashing passwords, changing passwords, and resetting passwords.
 @Injectable()
 export class PasswordService {
-  // Inject the Admin model and User model into the PasswordService
+  // Inject the Admin model, PasswordService, EmailService and TransactionService
   constructor(
     @Inject(forwardRef(() => AdminService)) private readonly adminService: AdminService,
     @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
     private readonly emailService: EmailService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   /* hashPassword is a method that takes a password and hashes it using bcrypt.
@@ -119,26 +121,29 @@ export class PasswordService {
         - InternalServerErrorException: if an error occurs
   */
   async resetPassword(email: string, userType: string): Promise<{ message: string }> {
-    try {
-      // Check if the userType is admin or user and get the service accordingly
-      const service: AdminService | UserService = userType === 'admin' ? this.adminService : this.userService;
-      const user = await service.findOneByEmail(email);
-      // Generate a random code form of 6 numbers
-      const code = Math.floor(100000 + Math.random() * 900000);
-      // add code to token in database and expire date after 1 hour
-      await service.updateWithoutDtoByFields(
-        { email },
-        { forgetPasswordToken: code, forgetPasswordTokenExpiry: new Date(Date.now() + 3600000) }
-      );
-      // send password reset email
-      await this.emailService.sendPasswordResetEmail(user.name, email, code);
-      return { message: 'Password reset email sent successfully' };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
+    return this.transactionService.withTransaction(async (session) => {
+      try {
+        // Check if the userType is admin or user and get the service accordingly
+        const service: AdminService | UserService = userType === 'admin' ? this.adminService : this.userService;
+        const user = await service.findOneByEmail(email);
+        // Generate a random code form of 6 numbers
+        const code = Math.floor(100000 + Math.random() * 900000);
+        // add code to token in database and expire date after 1 hour
+        await service.updateWithoutDtoByFields(
+          { email },
+          { forgetPasswordToken: code, forgetPasswordTokenExpiry: new Date(Date.now() + 3600000) },
+          session
+        );
+        // send password reset email
+        await this.emailService.sendPasswordResetEmail(user.name, email, code);
+        return { message: 'Password reset email sent successfully' };
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new InternalServerErrorException("Couldn't reset password");
       }
-      throw new InternalServerErrorException("Couldn't reset password");
-    }
+    });
   }
 
   /* changePasswordByToken is a method that takes a user's email, code, and new password and changes the password.
