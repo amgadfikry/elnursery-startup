@@ -6,8 +6,7 @@ import { ReturnedAdminDto } from './dto/returned-admin.dto';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 import { ApiErrorResponses } from '../common/decorators/api-error-response.decorator';
 import { Admin } from './schemas/admin.schema';
-import { UserType } from 'src/common/decorators/userType-guard.decorator';
-
+import { UserType } from '../common/decorators/userType-guard.decorator';
 /* Admin Controller with CRUD operations
     Attributes:
       adminService: Service for admin operations

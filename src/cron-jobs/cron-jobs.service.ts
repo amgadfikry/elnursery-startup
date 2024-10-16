@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { UserService } from "src/user/user.service";
+import { UserService } from "../user/user.service";
 
 // Service for the cron jobs module
 @Injectable()

@@ -3,10 +3,10 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserType } from 'src/common/decorators/userType-guard.decorator';
+import { UserType } from '../common/decorators/userType-guard.decorator';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 import { ReturnedTaskDto } from './dto/returned-task.dto';
-import { ApiErrorResponses } from 'src/common/decorators/api-error-response.decorator';
+import { ApiErrorResponses } from '../common/decorators/api-error-response.decorator';
 import { FilterTaskDto } from './dto/filter-task.dto';
 import { Task } from './schemas/task.schema';
 

@@ -1,10 +1,10 @@
 import { Controller, Post, Res, Req, Body, Param, Query } from '@nestjs/common';
 import { PasswordService } from './password.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiErrorResponses } from 'src/common/decorators/api-error-response.decorator';
+import { ApiErrorResponses } from '../common/decorators/api-error-response.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Response } from 'express';
-import { Public } from 'src/common/decorators/public-guard.decorator';
+import { Public } from '../common/decorators/public-guard.decorator';
 import { EmailResetPasswordDto } from './dto/email-reset-password.dto';
 import { ChangePasswordTokenDto } from './dto/change-password-token.dto';
 

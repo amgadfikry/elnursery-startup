@@ -23,9 +23,9 @@ export class TransactionService {
   async withTransaction<T>(fn: (session: ClientSession) => Promise<T>) : Promise<T> {
     // Start a session
     const session = await this.connection.startSession();
-    session.startTransaction();
-
+    
     try {
+      session.startTransaction();
       // Execute the function with the session
       const result = await fn(session);
       // Commit the transaction

@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Res, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiErrorResponses } from 'src/common/decorators/api-error-response.decorator';
+import { ApiErrorResponses } from '../common/decorators/api-error-response.decorator';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { Public } from '../common/decorators/public-guard.decorator';

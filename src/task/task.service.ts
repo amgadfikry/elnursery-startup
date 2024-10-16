@@ -11,7 +11,6 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession } from 'mongoose';
 import { FilterTaskDto } from './dto/filter-task.dto';
-import { ReturnedTaskDto } from './dto/returned-task.dto';
 
 /* Task Service with methods for CRUD operations
     Attributes:

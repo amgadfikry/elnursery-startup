@@ -11,9 +11,9 @@ import * as generator from 'generate-password';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from '../common/email.service';
 import { ChangePasswordTokenDto } from './dto/change-password-token.dto';
-import { AdminService } from 'src/admin/admin.service';
-import { UserService } from 'src/user/user.service';
-import { TransactionService } from 'src/transaction/transaction.service';
+import { AdminService } from '../admin/admin.service';
+import { UserService } from '../user/user.service';
+import { TransactionService } from '../transaction/transaction.service';
 
 // This service is responsible for hashing passwords, changing passwords, and resetting passwords.
 @Injectable()
@@ -62,7 +62,8 @@ export class PasswordService {
         - random password: string
   */
   generateRandomPassword(): string {
-    const password = generator.generate({
+    try {
+      const password = generator.generate({
       length: 10,
       numbers: true,
       lowercase: true,
@@ -72,6 +73,9 @@ export class PasswordService {
       exclude: '()[]{}<>:;.,?/!%^"\'\\',
     });
     return password;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   /* changePassword is a method that takes a user's old password, new password, and confirm password and changes the password.

@@ -11,9 +11,9 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { Admin, AdminDocument } from './schemas/admin.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { PasswordService } from 'src/password/password.service';
-import { EmailService } from 'src/common/email.service';
-import { TransactionService } from 'src/transaction/transaction.service';
+import { PasswordService } from '../password/password.service';
+import { EmailService } from '../common/email.service';
+import { TransactionService } from '../transaction/transaction.service';
 import { ClientSession } from 'mongoose';
 
 /* Admin Service with methods for CRUD operations
@@ -52,16 +52,15 @@ export class AdminService {
         const hashPassword = await this.passwordService.hashPassword(password);
         // create a new admin object and save it
         const adminData = { ...createAdminDto, password: hashPassword };
-        const newAdmin = new this.adminModel(adminData);
-        const createdAdmin = await newAdmin.save({ session });
+        const createdAdmin = await this.adminModel.create([adminData], { session });
         // send account credentials email to the admin
         await this.emailService.sendAccountCredentials(createAdminDto.name, createAdminDto.email, password);
-        return createdAdmin;
+        return createdAdmin[0];
       } catch (error) {
         if (error.code === 11000) {
           throw new ConflictException("Admin with this email already exist");
         }
-        throw new InternalServerErrorException('An Error occurred while creating the admin');
+        throw error;
       }
     });
   }
@@ -74,7 +73,7 @@ export class AdminService {
   */
   async findAll(): Promise<Admin[]> {
     try {
-      const admins = await this.adminModel.find().exec();
+      const admins = await this.adminModel.find();
       return admins;
     } catch (error) {
       throw new InternalServerErrorException('An Error occurred while Getting the list of admins');
@@ -92,7 +91,7 @@ export class AdminService {
   */
   async findOne(id: string): Promise<Admin> {
     try {
-      const admin = await this.adminModel.findById(id).exec();
+      const admin = await this.adminModel.findById(id);
       if (!admin) {
         throw new NotFoundException(`Admin not found`);
       }
@@ -119,7 +118,7 @@ export class AdminService {
   async remove(id: string, session: ClientSession = null): Promise<{ message: string }> {
     try {
       // get the admin details by id to check if the admin exist
-      const user = await this.adminModel.findById(id).exec();
+      const user = await this.adminModel.findById(id);
       if (!user) {
         throw new NotFoundException(`Admin not found`);
       }
@@ -128,10 +127,7 @@ export class AdminService {
         throw new BadRequestException('You cannot delete the owner account');
       }
       // delete the admin record
-      const result = await this.adminModel.deleteOne({ _id: id }, { session }).exec();
-      if (result.deletedCount === 0) {
-        throw new NotFoundException(`Admin not found`);
-      }
+      await this.adminModel.deleteOne({ _id: id }, { session });
       // return success message after deleting the admin
       return { message: 'Successfully deleted admin from records' };
     } catch (error) {
@@ -153,7 +149,7 @@ export class AdminService {
   */
   async findOneByEmail(email: string): Promise<AdminDocument> {
     try {
-      const admin = await this.adminModel.findOne({ email }).exec();
+      const admin = await this.adminModel.findOne({ email });
       if (!admin) {
         throw new NotFoundException('Admin not found');
       }
@@ -179,7 +175,7 @@ export class AdminService {
   */
   async updateWithoutDtoById(id: string, update: Object, session: ClientSession = null): Promise<AdminDocument> {
     try {
-      const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, update, { new: true, session }).exec();
+      const updatedAdmin = await this.adminModel.findByIdAndUpdate(id, update, { new: true, session });
       if (!updatedAdmin) {
         throw new NotFoundException('Admin not found');
       }
@@ -205,7 +201,7 @@ export class AdminService {
   */
   async updateWithoutDtoByFields(field: Object, update: Object, session: ClientSession = null): Promise<AdminDocument> {
     try {
-      const updatedAdmin = await this.adminModel.findOneAndUpdate(field, update, { new: true, session }).exec();
+      const updatedAdmin = await this.adminModel.findOneAndUpdate(field, update, { new: true, session });
       if (!updatedAdmin) {
         throw new NotFoundException('Admin not found');
       }

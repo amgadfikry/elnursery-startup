@@ -3,8 +3,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
-import { PasswordModule } from 'src/password/password.module';
-import { CommonModule } from 'src/common/common.module';
+import { PasswordModule } from '../password/password.module';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   // import user model and schema into the user module

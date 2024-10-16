@@ -1,4 +1,4 @@
-# test configuration
+# Testing configuration
 services:
   # server service container configuration
   server:
@@ -6,12 +6,26 @@ services:
       - NODE_ENV=test
     command: "npm run test:watch"
 
-  # mongodb service container configuration
-  mongodb:
+  # mongodb primary node service container configuration
+  mongodb-primary:
     volumes:
-      - mongo-vm-test:/data/db
+      - mongo-test-prime:/data/db
+
+  # mongodb secondary1 node service container configuration
+  mongodb-secondary1:
+    volumes:
+      - mongo-test-sec1:/data/db
+
+  # mongodb secondary2 node service container configuration
+  mongodb-secondary2:
+    volumes:
+      - mongo-test-sec2:/data/db
 
 # volumes configuration
 volumes:
-  mongo-vm-dev:
-    name: mongo-vm-test
+  mongo-test-prime:
+    name: mongo-test-prime
+  mongo-test-sec1:
+    name: mongo-test-sec1
+  mongo-test-sec2:
+    name: mongo-test-sec2

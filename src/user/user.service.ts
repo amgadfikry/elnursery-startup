@@ -9,10 +9,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
 import { ClientSession, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { PasswordService } from 'src/password/password.service';
+import { PasswordService } from '../password/password.service';
 import { User, UserDocument } from './schemas/user.schema';
-import { EmailService } from 'src/common/email.service';
-import { TransactionService } from 'src/transaction/transaction.service';
+import { EmailService } from '../common/email.service';
+import { TransactionService } from '../transaction/transaction.service';
 
 /* User Service with methods for CRUD operations
     Attributes:

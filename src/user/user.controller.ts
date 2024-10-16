@@ -5,9 +5,9 @@ import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TransformInterceptor } from '../interceptors/transform.interceptor';
 import { ReturnedUserDto } from './dto/returned-user.dto';
-import { ApiErrorResponses } from 'src/common/decorators/api-error-response.decorator';
+import { ApiErrorResponses } from '../common/decorators/api-error-response.decorator';
 import { User } from './schemas/user.schema';
-import { UserType } from 'src/common/decorators/userType-guard.decorator';
+import { UserType } from '../common/decorators/userType-guard.decorator';
 
 /* User Controller with CRUD operations
     Attributes:
