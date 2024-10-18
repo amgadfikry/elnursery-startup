@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import { HydratedDocument,Types } from 'mongoose';
+import { Child } from '../../child/schemas/child.schema';
 
 // HydratedDocument type to define the type of the UserDocument
 export type UserDocument = HydratedDocument<User>;
@@ -34,15 +35,15 @@ export class User {
   // list of childern names and ids of children in children collection
   // Is List of child object form of name of child and id of child string or objectID
   // Validate childrenList length not excced  children number
-  @Prop({ default: [],
+  @Prop({ default: [], ref: Child.name,
     validate: {
-      validator: function(value: { name: string, id: string | ObjectId }[]) {
+      validator: function(value: { name: string, id: string }[]) {
         return value.length <= this.children;
       },
       message: 'Children list length should not exceed children number'
     }
   })
-  childrenList: { name: string, id: string | ObjectId }[];
+  childrenList: { name: string, id: string }[];
 
   // isactive boolean to check if user is active
   @Prop({ default: true })

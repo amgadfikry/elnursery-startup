@@ -251,4 +251,41 @@ export class UserService {
       throw new InternalServerErrorException('An Error occurred while deactivating users');
     }
   }
+
+  /* addChild method to add child to the parent's children array
+    Parameters:
+      - parentID: string
+      - childID: string
+      - session: ClientSession (optional)
+    Returns:
+      - message: string
+  */
+  async addChild(parentID: string, childData: { name: string, id: string }, session: ClientSession = null) : Promise<{ message: string }> {
+    try {
+      // add child ID to the parent's children array
+      await this.userModel.findByIdAndUpdate(parentID, { $push: { childrenList: childData } }, { session, runValidators: true});
+      return { message: 'Child added successfully' };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('An Error occurred while adding child');
+    }
+  }
+
+  /* removeChild method to remove child from the parent's children array
+    Parameters:
+      - parentID: string
+      - childID: string
+      - session: ClientSession (optional)
+    Returns:
+      - message: string
+  */
+  async removeChild(parentID: string, childID: string, session: ClientSession = null) : Promise<{ message: string }> {
+    try {
+      // remove child ID from the parent's children array
+      await this.userModel.findByIdAndUpdate(parentID, { $pull: { childrenList: { id: childID } } }, { session });
+      return { message: 'Child removed successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException('An Error occurred while removing child');
+    }
+  }
 }
