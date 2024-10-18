@@ -45,7 +45,7 @@ export class AuthService {
       return token;
     } 
     catch (error) {
-      if (error instanceof UnauthorizedException || NotFoundException) {
+      if (error instanceof UnauthorizedException || error instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid credentials');
       }
       throw new InternalServerErrorException('An error occurred while logging in');

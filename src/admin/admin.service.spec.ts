@@ -67,6 +67,7 @@ describe('AdminService', () => {
   // After each test, clear all the mocks
   afterEach(() => {
     jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
 

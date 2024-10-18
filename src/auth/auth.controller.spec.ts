@@ -3,18 +3,31 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 describe.skip('AuthController', () => {
-  let controller: AuthController;
+  // Define the variables that will be used in the tests
+  let authController: AuthController;
+
+  //   let mockAuthService: AuthService;
+  const mockAuthService = {
+    login: jest.fn(),
+  };
+
 
   beforeEach(async () => {
+    // Initialize the module with the AuthController and AuthService
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [
+        { provide: AuthService, useValue: mockAuthService },
+      ]
     }).compile();
-
-    controller = module.get<AuthController>(AuthController);
+    // Get the AuthController from the module
+    authController = module.get<AuthController>(AuthController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  // After each test, reset the mocks
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.clearAllTimers();
   });
+
 });
