@@ -28,7 +28,7 @@ export class AuthController {
   // POST /auth/login/:type - login and set token in cookie
   @Public() // Set the route as public
   @Post('login/:type')
-  @ApiOperation({ summary: 'Login and set token in cookie' })
+  @ApiOperation({ summary: 'Login admin or user and set token in cookie (public)' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiErrorResponses([400, 401, 404, 500])
   async login(@Body() loginDto: LoginDto, @Param('type') type: 'admin' | 'user', @Res() res: Response) {
@@ -39,7 +39,7 @@ export class AuthController {
 
   // POST /auth/logout - logout and clear token in cookie
   @Post('logout')
-  @ApiOperation({ summary: 'Logout and clear token in cookie' })
+  @ApiOperation({ summary: 'Logout admin or user and clear token in cookie (admin/user)' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
   @ApiErrorResponses([400, 401, 404, 500])
   async logout(@Res() res: Response) {

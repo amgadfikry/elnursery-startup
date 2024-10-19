@@ -18,7 +18,7 @@ export class PasswordController {
 
   // POST /password/change - change password
   @Post('change')
-  @ApiOperation({ summary: 'Change password' })
+  @ApiOperation({ summary: 'Change password of the admin or user logged in and then clear the token cookie (admin/user)' })
   @ApiResponse({ status: 200, description: 'Successful change password.' })
   @ApiErrorResponses([400, 401, 404, 500])
   async changePassword(@Body() changePasswordDto: ChangePasswordDto, @Res() res: Response, @Req() req: any) {
@@ -35,7 +35,7 @@ export class PasswordController {
   // POST /password/reset - reset password
   @Post('reset/:type')
   @Public()
-  @ApiOperation({ summary: 'Reset password' })
+  @ApiOperation({ summary: 'Reset password of the admin or user and send reset code to email (public)' })
   @ApiResponse({ status: 200, description: 'Successful reset password.' })
   @ApiErrorResponses([400, 401, 404, 500])
   async resetPassword(@Body() emailResetPasswordDto: EmailResetPasswordDto, @Param('type') type: string) : Promise<{ message: string }> {
@@ -45,7 +45,7 @@ export class PasswordController {
   // POST /password/reset/:type - reset password with token
   @Post('change/:type')
   @Public()
-  @ApiOperation({ summary: 'Change password with token' })
+  @ApiOperation({ summary: 'Change password of the admin or user with token, email and new password (public)' })
   @ApiResponse({ status: 200, description: 'Successful reset password with token.' })
   @ApiErrorResponses([400, 401, 404, 500])
   async resetPasswordWithToken(
