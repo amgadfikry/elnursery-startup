@@ -4,10 +4,11 @@ import { Injectable,
   NotFoundException,
   forwardRef,
   Inject,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
-import { ClientSession, Model } from 'mongoose';
+import { ClientSession, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PasswordService } from '../password/password.service';
 import { User, UserDocument } from './schemas/user.schema';
@@ -260,13 +261,23 @@ export class UserService {
     Returns:
       - message: string
   */
-  async addChild(parentID: string, childData: { name: string, id: string }, session: ClientSession = null) : Promise<{ message: string }> {
+  async addChild(parentID: string, childId: String, session: ClientSession = null) : Promise<{ message: string }> {
     try {
       // add child ID to the parent's children array
-      await this.userModel.findByIdAndUpdate(parentID, { $push: { childrenList: childData } }, { session, runValidators: true});
+      const user = await this.userModel.findByIdAndUpdate(parentID, { $push: { childrenList: childId } }, { new: true, session });
+      // check if parent exists throw error if not
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      if (user.childrenList.length > user.children) {
+        throw new BadRequestException('Maximum number of children reached');
+      }
       return { message: 'Child added successfully' };
     } catch (error) {
-      console.log(error);
+      // if validation error occurs, return error message
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException('An Error occurred while adding child');
     }
   }
@@ -282,9 +293,16 @@ export class UserService {
   async removeChild(parentID: string, childID: string, session: ClientSession = null) : Promise<{ message: string }> {
     try {
       // remove child ID from the parent's children array
-      await this.userModel.findByIdAndUpdate(parentID, { $pull: { childrenList: { id: childID } } }, { session });
+      const user = await this.userModel.findByIdAndUpdate(parentID, { $pull: { childrenList: childID } }, { new: true, session });
+      // check if parent exists throw error if not
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
       return { message: 'Child removed successfully' };
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException('An Error occurred while removing child');
     }
   }
