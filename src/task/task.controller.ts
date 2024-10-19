@@ -30,7 +30,7 @@ export class TaskController {
   @Post()
   @UserType('admin') // Check if the user type is admin
   @UseInterceptors(new TransformInterceptor(ReturnedTaskDto)) // Transform the response to the ReturnedTaskDto
-  @ApiOperation({ summary: 'Create a new task' })
+  @ApiOperation({ summary: 'Create a new task item (admin only)' })
   @ApiResponse({ status: 200, description: 'Successful create a new task record.', type: ReturnedTaskDto })
   @ApiErrorResponses([400, 401, 404, 409, 500]) // Custom error responses Swagger decorator
   async create(@Body() createTaskDto: CreateTaskDto) : Promise<Task> {
@@ -41,7 +41,7 @@ export class TaskController {
   @Get()
   @UserType('admin') // Check if the user type is admin
   @UseInterceptors(new TransformInterceptor(ReturnedTaskDto)) // Transform the response to the ReturnedTaskDto
-  @ApiOperation({ summary: 'Get all tasks records' })
+  @ApiOperation({ summary: 'Get list of tasks either all or filtered by query parameters (admin only)' })
   @ApiResponse({ status: 200, description: 'Successful retrieval list of tasks records.', type: ReturnedTaskDto })
   @ApiErrorResponses([400, 401, 404, 500]) // Custom error responses Swagger decorator
   async findAll(@Query() filters?: FilterTaskDto): Promise<Task[]> {
@@ -51,7 +51,7 @@ export class TaskController {
   // GET /tasks/:id - get task by id
   @Get(':id')
   @UseInterceptors(new TransformInterceptor(ReturnedTaskDto)) // Transform the response to the ReturnedTaskDto
-  @ApiOperation({ summary: 'Get task using id' })
+  @ApiOperation({ summary: 'Get a specific task item using id (admin/user)' })
   @ApiResponse({ status: 200, description: 'Successful retrieval of task record.', type: ReturnedTaskDto })
   @ApiErrorResponses([400, 401, 404, 500]) // Custom error responses Swagger decorator
   async findOne(@Param('id') id: string) : Promise<Task> {
@@ -62,7 +62,7 @@ export class TaskController {
   @Patch(':id')
   @UserType('admin') // Check if the user type is admin
   @UseInterceptors(new TransformInterceptor(ReturnedTaskDto)) // Transform the response to the ReturnedTaskDto
-  @ApiOperation({ summary: 'Update task using id' })
+  @ApiOperation({ summary: 'Update an existing task item using id (admin only)' })
   @ApiResponse({ status: 200, description: 'Successful update task record.', type: ReturnedTaskDto })
   @ApiErrorResponses([400, 401, 404, 500]) // Custom error responses Swagger decorator
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) : Promise<Task> {
@@ -72,7 +72,7 @@ export class TaskController {
   // DELETE /tasks/:id - delete task by id
   @Delete(':id')
   @UserType('admin') // Check if the user type is admin
-  @ApiOperation({ summary: 'Delete task using id' })
+  @ApiOperation({ summary: 'Delete a specific task item using id (admin only)' })
   @ApiResponse({ status: 200, description: 'Successful delete task from records.'})
   @ApiErrorResponses([400, 401, 404, 500])
   async remove(@Param('id') id: string) : Promise<{ message: string }> {
