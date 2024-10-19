@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsDateString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 // Data transfer object for creating a new Child
@@ -10,10 +10,10 @@ export class CreateChildDto {
   name: string;
 
   // date of birth of child
-  @ApiProperty({ example: '12/12/2022', description: 'Date of birth of child'})
-  @IsString({ message: 'Date of birth must be a string' })
+  @ApiProperty({ example: '2021-01-01', description: 'Date of birth of child'})
+  @IsDateString()
   @IsNotEmpty()
-  dateOfBirth: string;
+  dateOfBirth: Date;
 
   // avatar URL of child
   @ApiProperty({ example: 'https://example.com/avatar.png', description: 'Avatar URL of child'})

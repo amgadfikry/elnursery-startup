@@ -1,13 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { User } from '../../user/schemas/user.schema';
-
 
 // HydratedDocument type to define the type of the ChildDocument
 export type ChildDocument = HydratedDocument<Child>;
 
 // Schema for the Child collection
-@Schema()
+@Schema({
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class Child {
   // parent id of child
   @Prop({ required: true, ref: 'User' })
@@ -21,23 +22,13 @@ export class Child {
   @Prop({ required: true })
   dateOfBirth: string;
 
-  // Age of child
-  // Getter to calculate age of child
-  get age(): number {
-    return new Date().getFullYear() - new Date(this.dateOfBirth).getFullYear();
-  }
-
   // assesment result list of child
-  @Prop({ type:[Types.ObjectId], default: [] })
-  assessmentResults: Types.ObjectId[];
+  @Prop({ type:[String], default: [] })
+  assessmentResults: String[];
 
   // program list of child
-  @Prop({ type:[Types.ObjectId], default: [] })
-  programList: Types.ObjectId[];
-
-  // pause program boolean to check if child is paused
-  @Prop({ default: false })
-  pauseProgram: boolean;
+  @Prop({ type:[String], default: [] })
+  programList: String[];
 
   // avatar URL of child
   @Prop({ default: '' })
@@ -47,3 +38,14 @@ export class Child {
 // ChildSchema constant to define the schema for the Child collection
 export const ChildSchema = SchemaFactory.createForClass(Child);
 
+// Create age virtual property for child schema to calculate age from date of birth
+ChildSchema.virtual('age').get(function() {
+  // calculate age from date of birth
+  const dob = new Date(this.dateOfBirth);
+  // calculate difference in milliseconds
+  const diff_ms = Date.now() - dob.getTime();
+  // create date object from difference in milliseconds
+  const age_dt = new Date(diff_ms);
+  // return age in years and months format
+  return Math.abs(age_dt.getUTCFullYear() - 1970) + ' years ' + age_dt.getUTCMonth() + ' months';
+});

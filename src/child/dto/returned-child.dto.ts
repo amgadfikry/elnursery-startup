@@ -35,12 +35,6 @@ export class ReturnedChildDto {
   @Expose()
   age: number;
 
-  // pause program boolean to check if child is paused
-  @ApiProperty()
-  @IsBoolean()
-  @Expose()
-  pauseProgram?: boolean;
-
   // Avatar URL of child
   @ApiProperty()
   @IsString()
