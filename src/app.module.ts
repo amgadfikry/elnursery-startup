@@ -13,6 +13,7 @@ import { CronJobsModule } from './cron-jobs/cron-jobs.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TaskModule } from './task/task.module';
 import { ChildModule } from './child/child.module';
+import { ProgramModule } from './program/program.module';
 @Module({ 
   // Import the MongooseModule and AdminModule into the AppModule
   imports: [
@@ -25,7 +26,8 @@ import { ChildModule } from './child/child.module';
     AdminModule,
     UserModule,
     TaskModule,
-    ChildModule
+    ChildModule,
+    ProgramModule
   ],
   controllers: [],
   providers: [
